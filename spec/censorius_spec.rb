@@ -42,10 +42,10 @@ RSpec.describe Censorius::UUIDGenerator do
     @generator.generate!
 
     expect(@project.objects_by_uuid.keys.sort).to eq %W[
-      PBXFileReference(${BUILT_PRODUCTS_DIR}/built_product.txt)
-      PBXFileReference(at_root.txt)
-      PBXFileReference(group/in_group.txt)
       PBXProject(#{@spec_safe_name})
+      PBXProject(#{@spec_safe_name})/PBXFileReference(${BUILT_PRODUCTS_DIR}/built_product.txt)
+      PBXProject(#{@spec_safe_name})/PBXFileReference(at_root.txt)
+      PBXProject(#{@spec_safe_name})/PBXFileReference(group/in_group.txt)
       PBXProject(#{@spec_safe_name})/PBXGroup(/)
       PBXProject(#{@spec_safe_name})/PBXGroup(/Frameworks)
       PBXProject(#{@spec_safe_name})/PBXGroup(/Products)
