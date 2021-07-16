@@ -55,4 +55,21 @@ RSpec.describe Censorius::UUIDGenerator do
       PBXProject(#{@spec_safe_name})/XCConfigurationList/XCBuildConfiguration(Release)
     ].map { |k| Digest::MD5.hexdigest(k).upcase }.sort
   end
+
+  it 'generates UUIDs for build configurations' do
+    @project.add_build_configuration('OtherConfig', :debug)
+
+    @generator.generate!
+
+    expect(@project.objects_by_uuid.keys.sort).to eq %W[
+      PBXProject(#{@spec_safe_name})
+      PBXProject(#{@spec_safe_name})/PBXGroup(/)
+      PBXProject(#{@spec_safe_name})/PBXGroup(/Frameworks)
+      PBXProject(#{@spec_safe_name})/PBXGroup(/Products)
+      PBXProject(#{@spec_safe_name})/XCConfigurationList
+      PBXProject(#{@spec_safe_name})/XCConfigurationList/XCBuildConfiguration(Debug)
+      PBXProject(#{@spec_safe_name})/XCConfigurationList/XCBuildConfiguration(OtherConfig)
+      PBXProject(#{@spec_safe_name})/XCConfigurationList/XCBuildConfiguration(Release)
+    ].map { |k| Digest::MD5.hexdigest(k).upcase }.sort
+  end
 end
