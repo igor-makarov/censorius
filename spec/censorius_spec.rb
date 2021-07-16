@@ -20,10 +20,10 @@ RSpec.describe Censorius::UUIDGenerator do
     @generator.generate!
 
     expect(@project.objects_by_uuid.keys.sort).to eq %W[
-      PBXGroup(/)
-      PBXGroup(/Frameworks)
-      PBXGroup(/Products)
       PBXProject(#{@spec_safe_name})
+      PBXProject(#{@spec_safe_name})/PBXGroup(/)
+      PBXProject(#{@spec_safe_name})/PBXGroup(/Frameworks)
+      PBXProject(#{@spec_safe_name})/PBXGroup(/Products)
       PBXProject(#{@spec_safe_name})/XCConfigurationList
       PBXProject(#{@spec_safe_name})/XCConfigurationList/XCBuildConfiguration(Debug)
       PBXProject(#{@spec_safe_name})/XCConfigurationList/XCBuildConfiguration(Release)

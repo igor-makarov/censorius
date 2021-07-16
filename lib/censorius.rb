@@ -39,7 +39,8 @@ module Censorius
       when Xcodeproj::Workspace::FileReference
         @paths_by_object[object] = "FileReference(#{object.path})"
       when Xcodeproj::Project::Object::PBXGroup
-        @paths_by_object[object] = "PBXGroup(#{object.hierarchy_path || '/'})"
+        project_path = @paths_by_object[object.project.root_object]
+        @paths_by_object[object] = "#{project_path}/PBXGroup(#{object.hierarchy_path || '/'})"
         object.children.each do |child|
           generate_paths(child, @paths_by_object[object])
         end
