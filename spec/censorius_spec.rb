@@ -4,7 +4,6 @@ RSpec.describe Censorius::UUIDGenerator do
   before(:each) do |s|
     @spec_safe_name = s.metadata[:full_description].gsub(/[^0-9a-z]/i, '_')
     @project = Xcodeproj::Project.new("#{@spec_safe_name}.xcodeproj")
-    @project.main_group.children.each(&:remove_from_project)
     @generator = Censorius::UUIDGenerator.new([@project])
   end
 
@@ -18,8 +17,6 @@ RSpec.describe Censorius::UUIDGenerator do
   end
 
   it 'generates UUIDs for default project' do
-    @project = Xcodeproj::Project.new("#{@spec_safe_name}.xcodeproj")
-    @generator = Censorius::UUIDGenerator.new([@project])
     @generator.generate!
 
     expect(@project.objects_by_uuid.keys.sort).to eq %W[
