@@ -33,7 +33,7 @@ RSpec.describe Censorius::UUIDGenerator do
   it 'generates UUIDs for default project' do
     @generator.generate!
 
-    expect(@project.objects_by_uuid.keys.sort).to eq %W[
+    expect(@project.sorted_md5s).to eq %W[
       PBXProject(#{@spec_safe_name})
       PBXProject(#{@spec_safe_name})/PBXGroup(/)
       PBXProject(#{@spec_safe_name})/PBXGroup(/Frameworks)
@@ -41,7 +41,7 @@ RSpec.describe Censorius::UUIDGenerator do
       PBXProject(#{@spec_safe_name})/XCConfigurationList
       PBXProject(#{@spec_safe_name})/XCConfigurationList/XCBuildConfiguration(Debug)
       PBXProject(#{@spec_safe_name})/XCConfigurationList/XCBuildConfiguration(Release)
-    ].map { |k| Digest::MD5.hexdigest(k).upcase }.sort
+    ].sorted_md5s
   end
 
   it 'generates UUIDs for file references' do
@@ -51,7 +51,7 @@ RSpec.describe Censorius::UUIDGenerator do
     @project.new_file('built_product.txt', :built_products)
     @generator.generate!
 
-    expect(@project.objects_by_uuid.keys.sort).to eq %W[
+    expect(@project.sorted_md5s).to eq %W[
       PBXProject(#{@spec_safe_name})
       PBXProject(#{@spec_safe_name})/PBXFileReference(${BUILT_PRODUCTS_DIR}/built_product.txt)
       PBXProject(#{@spec_safe_name})/PBXFileReference(at_root.txt)
@@ -63,7 +63,7 @@ RSpec.describe Censorius::UUIDGenerator do
       PBXProject(#{@spec_safe_name})/XCConfigurationList
       PBXProject(#{@spec_safe_name})/XCConfigurationList/XCBuildConfiguration(Debug)
       PBXProject(#{@spec_safe_name})/XCConfigurationList/XCBuildConfiguration(Release)
-    ].map { |k| Digest::MD5.hexdigest(k).upcase }.sort
+    ].sorted_md5s
   end
 
   it 'generates UUIDs for build configurations' do
@@ -71,7 +71,7 @@ RSpec.describe Censorius::UUIDGenerator do
 
     @generator.generate!
 
-    expect(@project.objects_by_uuid.keys.sort).to eq %W[
+    expect(@project.sorted_md5s).to eq %W[
       PBXProject(#{@spec_safe_name})
       PBXProject(#{@spec_safe_name})/PBXGroup(/)
       PBXProject(#{@spec_safe_name})/PBXGroup(/Frameworks)
@@ -80,7 +80,7 @@ RSpec.describe Censorius::UUIDGenerator do
       PBXProject(#{@spec_safe_name})/XCConfigurationList/XCBuildConfiguration(Debug)
       PBXProject(#{@spec_safe_name})/XCConfigurationList/XCBuildConfiguration(OtherConfig)
       PBXProject(#{@spec_safe_name})/XCConfigurationList/XCBuildConfiguration(Release)
-    ].map { |k| Digest::MD5.hexdigest(k).upcase }.sort
+    ].sorted_md5s
   end
 
   it 'generates UUIDs for native targets' do
@@ -90,7 +90,7 @@ RSpec.describe Censorius::UUIDGenerator do
     @project['Frameworks/iOS'].remove_from_project
     @generator.generate!
 
-    expect(@project.objects_by_uuid.keys.sort).to eq %W[
+    expect(@project.sorted_md5s).to eq %W[
       PBXProject(#{@spec_safe_name})
       PBXProject(#{@spec_safe_name})/PBXFileReference(${BUILT_PRODUCTS_DIR}/AppTarget.app)
       PBXProject(#{@spec_safe_name})/PBXGroup(/)
@@ -103,7 +103,7 @@ RSpec.describe Censorius::UUIDGenerator do
       PBXProject(#{@spec_safe_name})/XCConfigurationList
       PBXProject(#{@spec_safe_name})/XCConfigurationList/XCBuildConfiguration(Debug)
       PBXProject(#{@spec_safe_name})/XCConfigurationList/XCBuildConfiguration(Release)
-    ].map { |k| Digest::MD5.hexdigest(k).upcase }.sort
+    ].sorted_md5s
   end
 
   it 'generates UUIDs for build phases' do
@@ -120,7 +120,7 @@ RSpec.describe Censorius::UUIDGenerator do
 
     @generator.generate!
 
-    expect(@project.objects_by_uuid.keys.sort).to eq %W[
+    expect(@project.sorted_md5s).to eq %W[
       PBXProject(#{@spec_safe_name})
       PBXProject(#{@spec_safe_name})/PBXFileReference(${BUILT_PRODUCTS_DIR}/AppTarget.app)
       PBXProject(#{@spec_safe_name})/PBXGroup(/)
@@ -140,7 +140,7 @@ RSpec.describe Censorius::UUIDGenerator do
       PBXProject(#{@spec_safe_name})/XCConfigurationList
       PBXProject(#{@spec_safe_name})/XCConfigurationList/XCBuildConfiguration(Debug)
       PBXProject(#{@spec_safe_name})/XCConfigurationList/XCBuildConfiguration(Release)
-    ].map { |k| Digest::MD5.hexdigest(k).upcase }.sort
+    ].sorted_md5s
   end
 
   it 'generates UUIDs for build files' do
@@ -151,7 +151,7 @@ RSpec.describe Censorius::UUIDGenerator do
     target.source_build_phase.remove_from_project
     @generator.generate!
 
-    expect(@project.objects_by_uuid.keys.sort).to eq %W[
+    expect(@project.sorted_md5s).to eq %W[
       PBXProject(#{@spec_safe_name})
       PBXProject(#{@spec_safe_name})/PBXFileReference(${BUILT_PRODUCTS_DIR}/AppTarget.app)
       PBXProject(#{@spec_safe_name})/PBXFileReference(${DEVELOPER_DIR}/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.0.sdk/System/Library/Frameworks/Foundation.framework)
@@ -172,6 +172,6 @@ RSpec.describe Censorius::UUIDGenerator do
       PBXProject(#{@spec_safe_name})/XCConfigurationList
       PBXProject(#{@spec_safe_name})/XCConfigurationList/XCBuildConfiguration(Debug)
       PBXProject(#{@spec_safe_name})/XCConfigurationList/XCBuildConfiguration(Release)
-    ].map { |k| Digest::MD5.hexdigest(k).upcase }.sort
+    ].sorted_md5s
   end
 end

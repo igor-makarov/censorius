@@ -14,3 +14,19 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 end
+
+# extension for more descriptive testing
+class Array
+  def sorted_md5s
+    map { |k| Digest::MD5.hexdigest(k).upcase }.sort
+  end
+end
+
+module Xcodeproj
+  # extension for more descriptive testing
+  class Project
+    def sorted_md5s
+      objects_by_uuid.keys.sort
+    end
+  end
+end
