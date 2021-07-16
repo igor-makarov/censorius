@@ -16,6 +16,16 @@ RSpec.describe Censorius::UUIDGenerator do
     @project.save
   end
 
+  def recursive_add_file(path)
+    group = @project.main_group
+    components = path.split('/')
+    components[0..-2].each do |component|
+      group = group.new_group(component, component)
+    end
+    file = group.new_file(components.last)
+    [group, file]
+  end
+
   it 'has a version number' do
     expect(Censorius::VERSION).not_to be nil
   end
@@ -87,6 +97,38 @@ RSpec.describe Censorius::UUIDGenerator do
       PBXProject(#{@spec_safe_name})/PBXGroup(/Frameworks)
       PBXProject(#{@spec_safe_name})/PBXGroup(/Products)
       PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)
+      PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/XCConfigurationList
+      PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/XCConfigurationList/XCBuildConfiguration(Debug)
+      PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/XCConfigurationList/XCBuildConfiguration(Release)
+      PBXProject(#{@spec_safe_name})/XCConfigurationList
+      PBXProject(#{@spec_safe_name})/XCConfigurationList/XCBuildConfiguration(Debug)
+      PBXProject(#{@spec_safe_name})/XCConfigurationList/XCBuildConfiguration(Release)
+    ].map { |k| Digest::MD5.hexdigest(k).upcase }.sort
+  end
+
+  it 'generates UUIDs for build files' do
+    _, framework = recursive_add_file('path/to/Framework.framework')
+    target = @project.new_target(:application, 'AppTarget', :ios)
+    target.frameworks_build_phase.add_file_reference(framework)
+    target.resources_build_phase.remove_from_project
+    target.source_build_phase.remove_from_project
+    @generator.generate!
+
+    expect(@project.objects_by_uuid.keys.sort).to eq %W[
+      PBXProject(#{@spec_safe_name})
+      PBXProject(#{@spec_safe_name})/PBXFileReference(${BUILT_PRODUCTS_DIR}/AppTarget.app)
+      PBXProject(#{@spec_safe_name})/PBXFileReference(${DEVELOPER_DIR}/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.0.sdk/System/Library/Frameworks/Foundation.framework)
+      PBXProject(#{@spec_safe_name})/PBXFileReference(path/to/Framework.framework)
+      PBXProject(#{@spec_safe_name})/PBXGroup(/)
+      PBXProject(#{@spec_safe_name})/PBXGroup(/Frameworks)
+      PBXProject(#{@spec_safe_name})/PBXGroup(/Frameworks/iOS)
+      PBXProject(#{@spec_safe_name})/PBXGroup(/Products)
+      PBXProject(#{@spec_safe_name})/PBXGroup(/path)
+      PBXProject(#{@spec_safe_name})/PBXGroup(/path/to)
+      PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)
+      PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXFrameworksBuildPhase(Frameworks)
+      PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXFrameworksBuildPhase(Frameworks)/PBXBuildFile(PBXProject(#{@spec_safe_name})/PBXFileReference(${DEVELOPER_DIR}/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.0.sdk/System/Library/Frameworks/Foundation.framework))
+      PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXFrameworksBuildPhase(Frameworks)/PBXBuildFile(PBXProject(#{@spec_safe_name})/PBXFileReference(path/to/Framework.framework))
       PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/XCConfigurationList
       PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/XCConfigurationList/XCBuildConfiguration(Debug)
       PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/XCConfigurationList/XCBuildConfiguration(Release)
