@@ -74,25 +74,22 @@ RSpec.describe Censorius::UUIDGenerator do
   end
 
   it 'generates UUIDs for native targets' do
-    @project.new_target(:application, 'AppTarget', :ios)
+    target = @project.new_target(:application, 'AppTarget', :ios)
+    target.build_phases.first.remove_from_project until target.build_phases.empty?
+    @project['Frameworks/iOS'].children.first.remove_from_project
+    @project['Frameworks/iOS'].remove_from_project
     @generator.generate!
 
     expect(@project.objects_by_uuid.keys.sort).to eq %W[
       PBXProject(#{@spec_safe_name})
       PBXProject(#{@spec_safe_name})/PBXFileReference(${BUILT_PRODUCTS_DIR}/AppTarget.app)
-      PBXProject(#{@spec_safe_name})/PBXFileReference(${DEVELOPER_DIR}/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.0.sdk/System/Library/Frameworks/Foundation.framework)
       PBXProject(#{@spec_safe_name})/PBXGroup(/)
       PBXProject(#{@spec_safe_name})/PBXGroup(/Frameworks)
-      PBXProject(#{@spec_safe_name})/PBXGroup(/Frameworks/iOS)
       PBXProject(#{@spec_safe_name})/PBXGroup(/Products)
       PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)
       PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/XCConfigurationList
       PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/XCConfigurationList/XCBuildConfiguration(Debug)
       PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/XCConfigurationList/XCBuildConfiguration(Release)
-      PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXFrameworksBuildPhase(Frameworks)
-      PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXFrameworksBuildPhase(Frameworks)/PBXBuildFile(PBXProject(#{@spec_safe_name})/PBXFileReference(${DEVELOPER_DIR}/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.0.sdk/System/Library/Frameworks/Foundation.framework))
-      PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXResourcesBuildPhase(Resources)
-      PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXSourcesBuildPhase(Sources)
       PBXProject(#{@spec_safe_name})/XCConfigurationList
       PBXProject(#{@spec_safe_name})/XCConfigurationList/XCBuildConfiguration(Debug)
       PBXProject(#{@spec_safe_name})/XCConfigurationList/XCBuildConfiguration(Release)
