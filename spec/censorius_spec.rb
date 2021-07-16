@@ -7,6 +7,10 @@ RSpec.describe Censorius::UUIDGenerator do
     @generator = Censorius::UUIDGenerator.new([@project])
   end
 
+  after(:each) do
+    debug_output! unless ENV['CENSORIUS_SPEC_DEBUG'].nil?
+  end
+
   def debug_output!
     @generator.write_debug_paths
     @project.save
@@ -24,6 +28,28 @@ RSpec.describe Censorius::UUIDGenerator do
       PBXProject(#{@spec_safe_name})/PBXGroup(/)
       PBXProject(#{@spec_safe_name})/PBXGroup(/Frameworks)
       PBXProject(#{@spec_safe_name})/PBXGroup(/Products)
+      PBXProject(#{@spec_safe_name})/XCConfigurationList
+      PBXProject(#{@spec_safe_name})/XCConfigurationList/XCBuildConfiguration(Debug)
+      PBXProject(#{@spec_safe_name})/XCConfigurationList/XCBuildConfiguration(Release)
+    ].map { |k| Digest::MD5.hexdigest(k).upcase }.sort
+  end
+
+  it 'generates UUIDs for file references' do
+    group = @project.main_group.new_group('group', 'group')
+    group.new_file('in_group.txt')
+    @project.new_file('at_root.txt')
+    @project.new_file('built_product.txt', :built_products)
+    @generator.generate!
+
+    expect(@project.objects_by_uuid.keys.sort).to eq %W[
+      PBXFileReference(${BUILT_PRODUCTS_DIR}/built_product.txt)
+      PBXFileReference(at_root.txt)
+      PBXFileReference(group/in_group.txt)
+      PBXProject(#{@spec_safe_name})
+      PBXProject(#{@spec_safe_name})/PBXGroup(/)
+      PBXProject(#{@spec_safe_name})/PBXGroup(/Frameworks)
+      PBXProject(#{@spec_safe_name})/PBXGroup(/Products)
+      PBXProject(#{@spec_safe_name})/PBXGroup(/group)
       PBXProject(#{@spec_safe_name})/XCConfigurationList
       PBXProject(#{@spec_safe_name})/XCConfigurationList/XCBuildConfiguration(Debug)
       PBXProject(#{@spec_safe_name})/XCConfigurationList/XCBuildConfiguration(Release)
