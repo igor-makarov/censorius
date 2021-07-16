@@ -75,7 +75,7 @@ module Censorius
         @paths_by_object[object] = "#{path}/PBXReferenceProxy(#{object.source_tree}/#{object.path})"
         generate_paths(object.remote_ref, @paths_by_object[object]) if object.remote_ref
       else
-        raise "Unrecognized: #{object.class}"
+        raise "Unrecognized: #{object.class}, at: #{path}"
       end
 
       @paths_by_object[object]
