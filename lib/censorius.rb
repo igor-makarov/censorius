@@ -48,7 +48,7 @@ module Censorius
         project_path = @paths_by_object[object.project.root_object]
         @paths_by_object[object] = "#{project_path}/PBXFileReference(#{object.full_path})"
       when Xcodeproj::Project::Object::XCConfigurationList
-        @paths_by_object[object] = "#{object.target.class.name.split('::').last}(#{object.target})/XCConfigurationList"
+        @paths_by_object[object] = "#{path}/XCConfigurationList"
         object.build_configurations.each do |config|
           generate_paths(config, @paths_by_object[object])
         end
