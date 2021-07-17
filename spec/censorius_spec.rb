@@ -45,9 +45,9 @@ RSpec.describe Censorius::UUIDGenerator do
   end
 
   it 'generates UUIDs for file references' do
-    group = @project.main_group.new_group('group', 'group')
-    group.new_file('in_group.txt')
     @project.new_file('at_root.txt')
+    recursive_add_file('group/in_group.txt')
+    recursive_add_file('path/to/nested/group/nested.txt')
     @project.new_file('built_product.txt', :built_products)
     @generator.generate!
 
@@ -60,6 +60,11 @@ RSpec.describe Censorius::UUIDGenerator do
       PBXProject(#{@spec_safe_name})/PBXGroup(/Frameworks)
       PBXProject(#{@spec_safe_name})/PBXGroup(/Products)
       PBXProject(#{@spec_safe_name})/PBXGroup(/group)
+      PBXProject(#{@spec_safe_name})/PBXGroup(/path)
+      PBXProject(#{@spec_safe_name})/PBXGroup(/path/to)
+      PBXProject(#{@spec_safe_name})/PBXGroup(/path/to/nested)
+      PBXProject(#{@spec_safe_name})/PBXGroup(/path/to/nested/group)
+      PBXProject(#{@spec_safe_name})/PBXFileReference(path/to/nested/group/nested.txt)
       PBXProject(#{@spec_safe_name})/XCConfigurationList
       PBXProject(#{@spec_safe_name})/XCConfigurationList/XCBuildConfiguration(Debug)
       PBXProject(#{@spec_safe_name})/XCConfigurationList/XCBuildConfiguration(Release)
