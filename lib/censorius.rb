@@ -21,12 +21,7 @@ module Censorius
     def generate_paths(object, path = '')
       case object
       when Xcodeproj::Project::Object::PBXProject
-        @paths_by_object[object] = "PBXProject(#{object.name})"
-        generate_paths(object.main_group, @paths_by_object[object])
-        generate_paths(object.build_configuration_list, @paths_by_object[object])
-        object.targets.each do |target|
-          generate_paths(target, @paths_by_object[object])
-        end
+        generate_paths_project(object)
       when Xcodeproj::Project::Object::AbstractTarget
         @paths_by_object[object] = "#{path}/#{object.class.name.split('::').last}(#{object.name})"
         object.build_phases.each do |phase|
@@ -80,6 +75,15 @@ module Censorius
       end
 
       @paths_by_object[object]
+    end
+
+    def generate_paths_project(project)
+      @paths_by_object[project] = path = "PBXProject(#{project.name})"
+      generate_paths(project.main_group, path)
+      generate_paths(project.build_configuration_list, path)
+      project.targets.each do |target|
+        generate_paths(target, path)
+      end
     end
 
     def write_debug_paths
