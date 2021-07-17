@@ -27,8 +27,7 @@ module Censorius
       when Xcodeproj::Project::Object::PBXGroup
         generate_paths_group(object)
       when Xcodeproj::Project::Object::PBXFileReference
-        project_path = @paths_by_object[object.project.root_object]
-        @paths_by_object[object] = "#{project_path}/PBXFileReference(#{object.full_path})"
+        generate_paths_file_reference(object)
       when Xcodeproj::Project::Object::XCConfigurationList
         @paths_by_object[object] = "#{path}/XCConfigurationList"
         object.build_configurations.each do |config|
@@ -100,6 +99,11 @@ module Censorius
       group.children.each do |child|
         generate_paths(child, path)
       end
+    end
+
+    def generate_paths_file_reference(file_reference)
+      project_path = @paths_by_object[file_reference.project.root_object]
+      @paths_by_object[file_reference] = "#{project_path}/PBXFileReference(#{file_reference.full_path})"
     end
 
     def write_debug_paths
