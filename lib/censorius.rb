@@ -43,8 +43,7 @@ module Censorius
       when Xcodeproj::Project::Object::AbstractBuildPhase
         generate_paths_phase(object, path)
       when Xcodeproj::Project::Object::PBXBuildFile
-        file_ref_path = generate_paths(object.file_ref)
-        @paths_by_object[object] = "#{path}/PBXBuildFile(#{file_ref_path})"
+        generate_paths_build_file(object, path)
       when Xcodeproj::Project::Object::PBXContainerItemProxy
         params = [
           "type: #{object.proxy_type}",
@@ -92,6 +91,11 @@ module Censorius
       phase.files.each do |file|
         generate_paths(file, path)
       end
+    end
+
+    def generate_paths_build_file(build_file, parent_path)
+      file_ref_path = generate_paths(build_file.file_ref)
+      @paths_by_object[build_file] = "#{parent_path}/PBXBuildFile(#{file_ref_path})"
     end
 
     def write_debug_paths
