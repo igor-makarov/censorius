@@ -106,6 +106,50 @@ RSpec.describe Censorius::UUIDGenerator do
     ].sorted_md5s
   end
 
+  it 'generates UUIDs for target dependencies' do
+    target1 = @project.new_target(:application, 'AppTarget', :ios)
+    target1.build_phases.first.remove_from_project until target1.build_phases.empty?
+    target2 = @project.new_target(:framework, 'FrameworkTarget', :ios)
+    target2.build_phases.first.remove_from_project until target2.build_phases.empty?
+    @project['Frameworks/iOS'].children.first.remove_from_project
+    @project['Frameworks/iOS'].remove_from_project
+    target1.add_dependency(target2)
+
+    other_project = Xcodeproj::Project.new('OtherProject.xcodeproj')
+    Xcodeproj::Project::FileReferencesFactory.send(:new_file_reference, @project.main_group, other_project.path, :group)
+    other_project_target = other_project.new_target(:framework, 'FrameworkTargetInOtherProject', :ios)
+    target1.add_dependency(other_project_target)
+
+    @generator.generate!
+
+    expect(@project.sorted_md5s).to eq (%W[
+      PBXProject(#{@spec_safe_name})
+      PBXProject(#{@spec_safe_name})/PBXFileReference(${BUILT_PRODUCTS_DIR}/AppTarget.app)
+      PBXProject(#{@spec_safe_name})/PBXFileReference(${BUILT_PRODUCTS_DIR}/FrameworkTarget.framework)
+      PBXProject(#{@spec_safe_name})/PBXFileReference(OtherProject.xcodeproj)
+      PBXProject(#{@spec_safe_name})/PBXGroup(/)
+      PBXProject(#{@spec_safe_name})/PBXGroup(/Frameworks)
+      PBXProject(#{@spec_safe_name})/PBXGroup(/Products)
+      PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)
+    ] + [
+      "PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXTargetDependency(FrameworkTargetInOtherProject)/PBXContainerItemProxy(type:1, OtherProject.xcodeproj ,FrameworkTargetInOtherProject)",
+      "PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXTargetDependency(FrameworkTargetInOtherProject, PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXTargetDependency(FrameworkTargetInOtherProject)/PBXContainerItemProxy(type:1, OtherProject.xcodeproj ,FrameworkTargetInOtherProject))",
+      "PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXTargetDependency(FrameworkTarget)/PBXContainerItemProxy(type:1, Project object ,FrameworkTarget)",
+      "PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXTargetDependency(FrameworkTarget, PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXTargetDependency(FrameworkTarget)/PBXContainerItemProxy(type:1, Project object ,FrameworkTarget))"
+    ] + %W[
+      PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/XCConfigurationList
+      PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/XCConfigurationList/XCBuildConfiguration(Debug)
+      PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/XCConfigurationList/XCBuildConfiguration(Release)
+      PBXProject(#{@spec_safe_name})/PBXNativeTarget(FrameworkTarget)
+      PBXProject(#{@spec_safe_name})/PBXNativeTarget(FrameworkTarget)/XCConfigurationList
+      PBXProject(#{@spec_safe_name})/PBXNativeTarget(FrameworkTarget)/XCConfigurationList/XCBuildConfiguration(Debug)
+      PBXProject(#{@spec_safe_name})/PBXNativeTarget(FrameworkTarget)/XCConfigurationList/XCBuildConfiguration(Release)
+      PBXProject(#{@spec_safe_name})/XCConfigurationList
+      PBXProject(#{@spec_safe_name})/XCConfigurationList/XCBuildConfiguration(Debug)
+      PBXProject(#{@spec_safe_name})/XCConfigurationList/XCBuildConfiguration(Release)
+    ]).sorted_md5s
+  end
+
   it 'generates UUIDs for build phases' do
     target = @project.new_target(:application, 'AppTarget', :ios)
     target.frameworks_build_phase.files.first.remove_from_project until target.frameworks_build_phase.files.empty?
