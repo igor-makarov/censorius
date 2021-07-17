@@ -115,10 +115,9 @@ RSpec.describe Censorius::UUIDGenerator do
     @project['Frameworks/iOS'].remove_from_project
     target1.add_dependency(target2)
 
-    other_project = Xcodeproj::Project.new('OtherProject.xcodeproj')
-    Xcodeproj::Project::FileReferencesFactory.send(:new_file_reference, @project.main_group, other_project.path, :group)
-    other_project_target = other_project.new_target(:framework, 'FrameworkTargetInOtherProject', :ios)
-    target1.add_dependency(other_project_target)
+    other_project = Xcodeproj::Project.open('spec/fixtures/OtherProject.xcodeproj')
+    Xcodeproj::Project::FileReferencesFactory.new_reference(@project.main_group, other_project.path, :group)
+    target1.add_dependency(other_project.targets.first)
 
     @generator.generate!
 
@@ -126,12 +125,15 @@ RSpec.describe Censorius::UUIDGenerator do
       PBXProject(#{@spec_safe_name})
       PBXProject(#{@spec_safe_name})/PBXFileReference(${BUILT_PRODUCTS_DIR}/AppTarget.app)
       PBXProject(#{@spec_safe_name})/PBXFileReference(${BUILT_PRODUCTS_DIR}/FrameworkTarget.framework)
-      PBXProject(#{@spec_safe_name})/PBXFileReference(OtherProject.xcodeproj)
+      PBXProject(#{@spec_safe_name})/PBXFileReference(spec/fixtures/OtherProject.xcodeproj)
       PBXProject(#{@spec_safe_name})/PBXGroup(/)
       PBXProject(#{@spec_safe_name})/PBXGroup(/Frameworks)
       PBXProject(#{@spec_safe_name})/PBXGroup(/Products)
       PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)
     ] + [
+      "PBXProject(#{@spec_safe_name})/PBXGroup(/Products)/PBXReferenceProxy(BUILT_PRODUCTS_DIR/FrameworkTargetInOtherProject.framework)",
+      "PBXProject(#{@spec_safe_name})/PBXGroup(/Products)/PBXReferenceProxy(BUILT_PRODUCTS_DIR/FrameworkTargetInOtherProject.framework)/PBXContainerItemProxy(type: 2, containerPortal: OtherProject.xcodeproj, remoteInfo: Subproject)",
+
       "PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXTargetDependency(FrameworkTargetInOtherProject)",
       "PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXTargetDependency(FrameworkTargetInOtherProject)/PBXContainerItemProxy(type: 1, containerPortal: OtherProject.xcodeproj, remoteInfo: FrameworkTargetInOtherProject)",
       "PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXTargetDependency(FrameworkTarget)",
