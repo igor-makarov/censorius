@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/MethodLength
+# rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength
 
 require 'json'
 require 'xcodeproj'
@@ -44,10 +44,7 @@ module Censorius
         ]
         @paths_by_object[object] = "#{path}/PBXContainerItemProxy(#{params.join(', ')})"
       when Xcodeproj::Project::Object::PBXTargetDependency
-        raise "Unsupported: #{object}" unless object.target_proxy
-
-        @paths_by_object[object] = "#{path}/PBXTargetDependency(#{object.name})"
-        generate_paths(object.target_proxy, @paths_by_object[object])
+        generate_paths_target_dependency(object, path)
       when Xcodeproj::Project::Object::PBXReferenceProxy
         @paths_by_object[object] = "#{path}/PBXReferenceProxy(#{object.source_tree}/#{object.path})"
         generate_paths(object.remote_ref, @paths_by_object[object]) if object.remote_ref
@@ -112,6 +109,13 @@ module Censorius
     def generate_paths_file_reference(file_reference)
       project_path = @paths_by_object[file_reference.project.root_object]
       @paths_by_object[file_reference] = "#{project_path}/PBXFileReference(#{file_reference.full_path})"
+    end
+
+    def generate_paths_target_dependency(dependency, parent_path)
+      raise "Unsupported: #{dependency}" unless dependency.target_proxy
+
+      @paths_by_object[dependency] = path = "#{parent_path}/PBXTargetDependency(#{dependency.name})"
+      generate_paths(dependency.target_proxy, path)
     end
 
     def write_debug_paths
