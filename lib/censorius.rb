@@ -31,7 +31,7 @@ module Censorius
       when Xcodeproj::Project::Object::XCConfigurationList
         generate_paths_configuration_list(object, path)
       when Xcodeproj::Project::Object::XCBuildConfiguration
-        @paths_by_object[object] = "#{path}/XCBuildConfiguration(#{object.name})"
+        generate_paths_configuration(object, path)
       when Xcodeproj::Project::Object::AbstractBuildPhase
         generate_paths_phase(object, path)
       when Xcodeproj::Project::Object::PBXBuildFile
@@ -72,6 +72,10 @@ module Censorius
       configuration_list.build_configurations.each do |config|
         generate_paths(config, path)
       end
+    end
+
+    def generate_paths_configuration(configuration, parent_path)
+      @paths_by_object[configuration] = "#{parent_path}/XCBuildConfiguration(#{configuration.name})"
     end
 
     def generate_paths_target(target, parent_path)
