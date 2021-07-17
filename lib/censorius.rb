@@ -37,12 +37,7 @@ module Censorius
       when Xcodeproj::Project::Object::PBXBuildFile
         generate_paths_build_file(object, path)
       when Xcodeproj::Project::Object::PBXContainerItemProxy
-        params = [
-          "type: #{object.proxy_type}",
-          "containerPortal: #{object.container_portal_annotation.strip}",
-          "remoteInfo: #{object.remote_info}"
-        ]
-        @paths_by_object[object] = "#{path}/PBXContainerItemProxy(#{params.join(', ')})"
+        generate_paths_container_item_proxy(object, path)
       when Xcodeproj::Project::Object::PBXTargetDependency
         generate_paths_target_dependency(object, path)
       when Xcodeproj::Project::Object::PBXReferenceProxy
@@ -116,6 +111,15 @@ module Censorius
 
       @paths_by_object[dependency] = path = "#{parent_path}/PBXTargetDependency(#{dependency.name})"
       generate_paths(dependency.target_proxy, path)
+    end
+
+    def generate_paths_container_item_proxy(proxy, parent_path)
+      params = [
+        "type: #{proxy.proxy_type}",
+        "containerPortal: #{proxy.container_portal_annotation.strip}",
+        "remoteInfo: #{proxy.remote_info}"
+      ]
+      @paths_by_object[proxy] = "#{parent_path}/PBXContainerItemProxy(#{params.join(', ')})"
     end
 
     def write_debug_paths
