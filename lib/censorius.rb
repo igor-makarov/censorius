@@ -41,8 +41,7 @@ module Censorius
       when Xcodeproj::Project::Object::PBXTargetDependency
         generate_paths_target_dependency(object, path)
       when Xcodeproj::Project::Object::PBXReferenceProxy
-        @paths_by_object[object] = "#{path}/PBXReferenceProxy(#{object.source_tree}/#{object.path})"
-        generate_paths(object.remote_ref, @paths_by_object[object]) if object.remote_ref
+        generate_paths_reference_proxy(object, path)
       else
         raise "Unrecognized: #{object.class}, at: #{path}"
       end
@@ -120,6 +119,11 @@ module Censorius
         "remoteInfo: #{proxy.remote_info}"
       ]
       @paths_by_object[proxy] = "#{parent_path}/PBXContainerItemProxy(#{params.join(', ')})"
+    end
+
+    def generate_paths_reference_proxy(proxy, parent_path)
+      @paths_by_object[proxy] = path = "#{parent_path}/PBXReferenceProxy(#{proxy.source_tree}/#{proxy.path})"
+      generate_paths(proxy.remote_ref, path) if proxy.remote_ref
     end
 
     def write_debug_paths
