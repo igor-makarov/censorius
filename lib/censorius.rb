@@ -16,32 +16,32 @@ module Censorius
       end
     end
 
-    def generate_paths(object, path = '') # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength
+    def generate_paths(object, parent_path = '') # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength
       case object
       when Xcodeproj::Project::Object::PBXProject
         generate_paths_project(object)
       when Xcodeproj::Project::Object::AbstractTarget
-        generate_paths_target(object, path)
+        generate_paths_target(object, parent_path)
       when Xcodeproj::Project::Object::PBXGroup
         generate_paths_group(object)
       when Xcodeproj::Project::Object::PBXFileReference
         generate_paths_file_reference(object)
       when Xcodeproj::Project::Object::XCConfigurationList
-        generate_paths_configuration_list(object, path)
+        generate_paths_configuration_list(object, parent_path)
       when Xcodeproj::Project::Object::XCBuildConfiguration
-        generate_paths_configuration(object, path)
+        generate_paths_configuration(object, parent_path)
       when Xcodeproj::Project::Object::AbstractBuildPhase
-        generate_paths_phase(object, path)
+        generate_paths_phase(object, parent_path)
       when Xcodeproj::Project::Object::PBXBuildFile
-        generate_paths_build_file(object, path)
+        generate_paths_build_file(object, parent_path)
       when Xcodeproj::Project::Object::PBXContainerItemProxy
-        generate_paths_container_item_proxy(object, path)
+        generate_paths_container_item_proxy(object, parent_path)
       when Xcodeproj::Project::Object::PBXTargetDependency
-        generate_paths_target_dependency(object, path)
+        generate_paths_target_dependency(object, parent_path)
       when Xcodeproj::Project::Object::PBXReferenceProxy
-        generate_paths_reference_proxy(object, path)
+        generate_paths_reference_proxy(object, parent_path)
       else
-        raise "Unrecognized: #{object.class}, at: #{path}"
+        raise "Unrecognized: #{object.class}, at: #{parent_path}"
       end
 
       @paths_by_object[object]
