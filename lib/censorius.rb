@@ -25,11 +25,7 @@ module Censorius
       when Xcodeproj::Project::Object::AbstractTarget
         generate_paths_target(object, path)
       when Xcodeproj::Project::Object::PBXGroup
-        project_path = @paths_by_object[object.project.root_object]
-        @paths_by_object[object] = "#{project_path}/PBXGroup(#{object.hierarchy_path || '/'})"
-        object.children.each do |child|
-          generate_paths(child, @paths_by_object[object])
-        end
+        generate_paths_group(object)
       when Xcodeproj::Project::Object::PBXFileReference
         project_path = @paths_by_object[object.project.root_object]
         @paths_by_object[object] = "#{project_path}/PBXFileReference(#{object.full_path})"
@@ -96,6 +92,14 @@ module Censorius
     def generate_paths_build_file(build_file, parent_path)
       file_ref_path = generate_paths(build_file.file_ref)
       @paths_by_object[build_file] = "#{parent_path}/PBXBuildFile(#{file_ref_path})"
+    end
+
+    def generate_paths_group(group)
+      project_path = @paths_by_object[group.project.root_object]
+      @paths_by_object[group] = path = "#{project_path}/PBXGroup(#{group.hierarchy_path || '/'})"
+      group.children.each do |child|
+        generate_paths(child, path)
+      end
     end
 
     def write_debug_paths
