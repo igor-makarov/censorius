@@ -23,14 +23,7 @@ module Censorius
       when Xcodeproj::Project::Object::PBXProject
         generate_paths_project(object)
       when Xcodeproj::Project::Object::AbstractTarget
-        @paths_by_object[object] = "#{path}/#{object.class.name.split('::').last}(#{object.name})"
-        object.build_phases.each do |phase|
-          generate_paths(phase, @paths_by_object[object])
-        end
-        generate_paths(object.build_configuration_list, @paths_by_object[object])
-        object.dependencies.each do |dependency|
-          generate_paths(dependency, @paths_by_object[object])
-        end
+        generate_paths_target(object, path)
       when Xcodeproj::Project::Object::PBXGroup
         project_path = @paths_by_object[object.project.root_object]
         @paths_by_object[object] = "#{project_path}/PBXGroup(#{object.hierarchy_path || '/'})"
@@ -83,6 +76,17 @@ module Censorius
       generate_paths(project.build_configuration_list, path)
       project.targets.each do |target|
         generate_paths(target, path)
+      end
+    end
+
+    def generate_paths_target(target, parent_path)
+      @paths_by_object[target] = path = "#{parent_path}/#{target.class.name.split('::').last}(#{target.name})"
+      target.build_phases.each do |phase|
+        generate_paths(phase, path)
+      end
+      generate_paths(target.build_configuration_list, path)
+      target.dependencies.each do |dependency|
+        generate_paths(dependency, path)
       end
     end
 
