@@ -70,9 +70,8 @@ module Censorius
       when Xcodeproj::Project::Object::PBXTargetDependency
         raise "Unsupported: #{object}" unless object.target_proxy
 
-        prefix = "#{path}/PBXTargetDependency(#{object.name})"
-        proxy_name = generate_paths(object.target_proxy, prefix)
-        @paths_by_object[object] = "#{path}/PBXTargetDependency(#{object.name},#{proxy_name})"
+        @paths_by_object[object] = "#{path}/PBXTargetDependency(#{object.name})"
+        generate_paths(object.target_proxy, @paths_by_object[object])
       when Xcodeproj::Project::Object::PBXReferenceProxy
         @paths_by_object[object] = "#{path}/PBXReferenceProxy(#{object.source_tree}/#{object.path})"
         generate_paths(object.remote_ref, @paths_by_object[object]) if object.remote_ref

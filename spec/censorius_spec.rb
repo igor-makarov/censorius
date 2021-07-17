@@ -132,10 +132,10 @@ RSpec.describe Censorius::UUIDGenerator do
       PBXProject(#{@spec_safe_name})/PBXGroup(/Products)
       PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)
     ] + [
+      "PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXTargetDependency(FrameworkTargetInOtherProject)",
       "PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXTargetDependency(FrameworkTargetInOtherProject)/PBXContainerItemProxy(type: 1, containerPortal: OtherProject.xcodeproj, remoteInfo: FrameworkTargetInOtherProject)",
-      "PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXTargetDependency(FrameworkTargetInOtherProject,PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXTargetDependency(FrameworkTargetInOtherProject)/PBXContainerItemProxy(type: 1, containerPortal: OtherProject.xcodeproj, remoteInfo: FrameworkTargetInOtherProject))",
-      "PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXTargetDependency(FrameworkTarget)/PBXContainerItemProxy(type: 1, containerPortal: Project object, remoteInfo: FrameworkTarget)",
-      "PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXTargetDependency(FrameworkTarget,PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXTargetDependency(FrameworkTarget)/PBXContainerItemProxy(type: 1, containerPortal: Project object, remoteInfo: FrameworkTarget))"
+      "PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXTargetDependency(FrameworkTarget)",
+      "PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXTargetDependency(FrameworkTarget)/PBXContainerItemProxy(type: 1, containerPortal: Project object, remoteInfo: FrameworkTarget)"
     ] + %W[
       PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/XCConfigurationList
       PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/XCConfigurationList/XCBuildConfiguration(Debug)
