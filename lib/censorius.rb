@@ -61,14 +61,14 @@ module Censorius
         file_ref_path = generate_paths(object.file_ref)
         @paths_by_object[object] = "#{path}/PBXBuildFile(#{file_ref_path})"
       when Xcodeproj::Project::Object::PBXContainerItemProxy
-        params = [object.proxy_type, object.container_portal_annotation, object.remote_info]
+        params = [object.proxy_type, object.container_portal_annotation.strip, object.remote_info]
         @paths_by_object[object] = "#{path}/PBXContainerItemProxy(type:#{params.join(',')})"
       when Xcodeproj::Project::Object::PBXTargetDependency
         raise "Unsupported: #{object}" unless object.target_proxy
 
         prefix = "#{path}/PBXTargetDependency(#{object.name})"
         proxy_name = generate_paths(object.target_proxy, prefix)
-        @paths_by_object[object] = "#{path}/PBXTargetDependency(#{object.name}, #{proxy_name})"
+        @paths_by_object[object] = "#{path}/PBXTargetDependency(#{object.name},#{proxy_name})"
       when Xcodeproj::Project::Object::PBXReferenceProxy
         @paths_by_object[object] = "#{path}/PBXReferenceProxy(#{object.source_tree}/#{object.path})"
         generate_paths(object.remote_ref, @paths_by_object[object]) if object.remote_ref
