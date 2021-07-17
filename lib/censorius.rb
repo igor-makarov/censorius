@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength
-
 require 'json'
 require 'xcodeproj'
 
@@ -18,7 +16,7 @@ module Censorius
       end
     end
 
-    def generate_paths(object, path = '')
+    def generate_paths(object, path = '') # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength
       case object
       when Xcodeproj::Project::Object::PBXProject
         generate_paths_project(object)
@@ -138,5 +136,3 @@ module Censorius
     end
   end
 end
-
-# rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/MethodLength
