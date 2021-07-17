@@ -61,8 +61,12 @@ module Censorius
         file_ref_path = generate_paths(object.file_ref)
         @paths_by_object[object] = "#{path}/PBXBuildFile(#{file_ref_path})"
       when Xcodeproj::Project::Object::PBXContainerItemProxy
-        params = [object.proxy_type, object.container_portal_annotation.strip, object.remote_info]
-        @paths_by_object[object] = "#{path}/PBXContainerItemProxy(type:#{params.join(',')})"
+        params = [
+          "type: #{object.proxy_type}",
+          "containerPortal: #{object.container_portal_annotation.strip}",
+          "remoteInfo: #{object.remote_info}"
+        ]
+        @paths_by_object[object] = "#{path}/PBXContainerItemProxy(#{params.join(', ')})"
       when Xcodeproj::Project::Object::PBXTargetDependency
         raise "Unsupported: #{object}" unless object.target_proxy
 
