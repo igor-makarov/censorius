@@ -1,6 +1,16 @@
 # Censorius
 
-Censorius is a small gem that generates deterministic and stable UUID paths for [Xcodeproj](https://github.com/CocoaPods/Xcodeproj). It's meant to be used either with [CocoaPods](https://github.com/CocoaPods/CocoaPods) or [Xcake](https://github.com/igor-makarov/xcake) to reduce meaningless Xcode project file modifications, and therefore make Xcode incremental builds after project generation shorter.
+Censorius is a small gem that generates deterministic and stable UUID paths for [Xcodeproj](https://github.com/CocoaPods/Xcodeproj). It's meant to be used either with [CocoaPods](https://github.com/CocoaPods/CocoaPods) or [Xcake](https://github.com/igor-makarov/xcake) to reduce meaningless Xcode project file differences, and therefore make Xcode incremental builds after project generation shorter.
+
+Censorius covers all meaningful PBX file format elements. 
+
+## Why the name "Censorius"?
+
+In ancient Rome, a [censor](https://en.wikipedia.org/wiki/Roman_censor) was an official appointed to conduct the census, a process by which all of Rome's subjects were enumerated, and all their property was noted for the purpose of taxation.
+
+[Cato the Censor](https://en.wikipedia.org/wiki/Cato_the_Elder) was a Roman censor, who was mostly known for his catchphrase "Carthago delenda est" ("Carthage must be destroyed"), referring to the Carthaginian Empire that kept threatening and attacking Rome.
+
+The gem is named "Censorius" because it is my hope that with this final effort of conducting an object census of the Xcode project file, all the problems of the PBX file format will finally go away. _PBX delenda est._
 
 ## Installation
 
