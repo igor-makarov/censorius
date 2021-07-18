@@ -1,6 +1,8 @@
 # Censorius
 
-Censorius is a small gem that generates deterministic and stable UUID paths for [Xcodeproj](https://github.com/CocoaPods/Xcodeproj). It's meant to be used either with [CocoaPods](https://github.com/CocoaPods/CocoaPods) or [Xcake](https://github.com/igor-makarov/xcake) to reduce meaningless Xcode project file differences, and therefore make Xcode incremental builds after project generation shorter.
+Censorius is a small gem that generates deterministic and stable UUID paths for [Xcodeproj](https://github.com/CocoaPods/Xcodeproj). It's meant to be used either with [CocoaPods](https://github.com/CocoaPods/CocoaPods) or [Xcake](https://github.com/igor-makarov/xcake) to reduce meaningless Xcode project file differences, and therefore make Xcode incremental builds after project generation shorter. 
+
+It is meant as a replacement for the `Xcodeproj::Project#predictabilize_uuids` method, which generates deterministic UUIDs in a way that is very unstable on even the smallest changes.
 
 Censorius covers all meaningful PBX file format elements. 
 
@@ -29,6 +31,8 @@ In your `Podfile`:
 require 'censorius'
 #
 # Define your dependencies...
+#
+# Remove the `deterministic_uuids` option if you're using it.
 #
 post_install do |installer|
   installer.generated_projects.each do |project|
