@@ -1,4 +1,8 @@
 # Censorius
+[![Gem](https://img.shields.io/gem/v/censorius.svg)](https://rubygems.org/gems/censorius)
+[![Twitter: @igormaka](https://img.shields.io/badge/contact-@igormaka-blue.svg?style=flat)](https://twitter.com/igormaka)
+[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](./LICENSE.txt)
+[![Build Status](https://github.com/igor-makarov/censorius/workflows/Specs/badge.svg)](https://github.com/igor-makarov/censorius/actions)
 
 Censorius is a small gem that generates deterministic and stable UUID paths for [Xcodeproj](https://github.com/CocoaPods/Xcodeproj). It's meant to be used either with [CocoaPods](https://github.com/CocoaPods/CocoaPods) or [Xcake](https://github.com/igor-makarov/xcake) to reduce meaningless Xcode project file differences, and therefore make Xcode incremental builds after project generation shorter. 
 
