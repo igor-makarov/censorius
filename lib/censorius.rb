@@ -98,9 +98,18 @@ module Censorius
       end
     end
 
-    def generate_paths_file_reference(file_reference)
+    def generate_paths_file_reference(file_reference) # rubocop:disable Metrics/AbcSize
       project_path = @paths_by_object[file_reference.project.root_object]
-      @paths_by_object[file_reference] = "#{project_path}/PBXFileReference(#{file_reference.full_path})"
+      params = []
+      if !file_reference.name.nil? &&
+         !file_reference.name.empty? &&
+         file_reference.name != File.basename(file_reference.full_path, '.*') &&
+         file_reference.name != File.basename(file_reference.full_path)
+        params << "name: #{file_reference.name}"
+      end
+      params << file_reference.full_path.to_s
+
+      @paths_by_object[file_reference] = "#{project_path}/PBXFileReference(#{params.join(', ')})"
     end
 
     def generate_paths_target_dependency(dependency, parent_path)
