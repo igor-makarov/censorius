@@ -49,13 +49,19 @@ RSpec.describe Censorius::UUIDGenerator do
     recursive_add_file('group/in_group.txt')
     recursive_add_file('path/to/nested/group/nested.txt')
     @project.new_file('built_product.txt', :built_products)
+    with_different_name = @project.new_file('different_file.txt')
+    with_different_name.name = 'different_name'
+
     @generator.generate!
 
-    expect(@project.sorted_md5s).to eq %W[
+    expect(@project.sorted_md5s).to eq (%W[
       PBXProject(#{@spec_safe_name})
       PBXProject(#{@spec_safe_name})/PBXFileReference(${BUILT_PRODUCTS_DIR}/built_product.txt)
       PBXProject(#{@spec_safe_name})/PBXFileReference(at_root.txt)
       PBXProject(#{@spec_safe_name})/PBXFileReference(group/in_group.txt)
+    ] + [
+      "PBXProject(#{@spec_safe_name})/PBXFileReference(name: different_name, different_file.txt)"
+    ] + %W[
       PBXProject(#{@spec_safe_name})/PBXGroup(/)
       PBXProject(#{@spec_safe_name})/PBXGroup(/Frameworks)
       PBXProject(#{@spec_safe_name})/PBXGroup(/Products)
@@ -68,7 +74,7 @@ RSpec.describe Censorius::UUIDGenerator do
       PBXProject(#{@spec_safe_name})/XCConfigurationList
       PBXProject(#{@spec_safe_name})/XCConfigurationList/XCBuildConfiguration(Debug)
       PBXProject(#{@spec_safe_name})/XCConfigurationList/XCBuildConfiguration(Release)
-    ].sorted_md5s
+    ]).sorted_md5s
   end
 
   it 'generates UUIDs for build configurations' do
