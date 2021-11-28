@@ -16,7 +16,7 @@ module Censorius
       end
     end
 
-    def generate_paths(object, parent_path = '') # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength
+    def generate_paths(object, parent_path = '') # rubocop:disable Metrics/CyclomaticComplexity
       case object
       when Xcodeproj::Project::Object::PBXProject
         generate_paths_project(object)
@@ -109,7 +109,7 @@ module Censorius
       end
     end
 
-    def generate_paths_file_reference(file_reference) # rubocop:disable Metrics/AbcSize
+    def generate_paths_file_reference(file_reference)
       project_path = @paths_by_object[file_reference.project.root_object]
       params = []
       if !file_reference.name.nil? &&

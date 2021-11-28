@@ -1,8 +1,12 @@
 AllCops:
   NewCops: disable
 
+Metrics/AbcSize:
+  Enabled: false
 Metrics/ClassLength:
   Max: 1000
+Metrics/MethodLength:
+  Max: 50
 Style/StringLiterals:
   Enabled: true
   EnforcedStyle: single_quotes
