@@ -34,6 +34,8 @@ module Censorius
         generate_paths_phase(object, parent_path)
       when Xcodeproj::Project::Object::PBXBuildFile
         generate_paths_build_file(object, parent_path)
+      when Xcodeproj::Project::Object::PBXBuildRule
+        generate_paths_build_rule(object, parent_path)
       when Xcodeproj::Project::Object::PBXContainerItemProxy
         generate_paths_container_item_proxy(object, parent_path)
       when Xcodeproj::Project::Object::PBXTargetDependency
@@ -72,6 +74,11 @@ module Censorius
       target.build_phases.each do |phase|
         generate_paths(phase, path)
       end
+      if target.respond_to?(:build_rules)
+        target.build_rules.each do |rule|
+          generate_paths(rule, path)
+        end
+      end
       generate_paths(target.build_configuration_list, path)
       target.dependencies.each do |dependency|
         generate_paths(dependency, path)
@@ -88,6 +95,10 @@ module Censorius
     def generate_paths_build_file(build_file, parent_path)
       file_ref_path = generate_paths(build_file.file_ref)
       @paths_by_object[build_file] = "#{parent_path}/PBXBuildFile(#{file_ref_path})"
+    end
+
+    def generate_paths_build_rule(build_rule, parent_path)
+      @paths_by_object[build_rule] = "#{parent_path}/PBXBuildRule(#{build_rule.name})"
     end
 
     def generate_paths_group(group)

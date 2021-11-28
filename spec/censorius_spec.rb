@@ -26,6 +26,14 @@ RSpec.describe Censorius::UUIDGenerator do
     [group, file]
   end
 
+  def add_build_rule(target, rule_name)
+    rule = @project.new(Xcodeproj::Project::Object::PBXBuildRule)
+    rule.name = rule_name
+    yield rule if block_given?
+    target.build_rules << rule
+    rule
+  end
+
   it 'has a version number' do
     expect(Censorius::VERSION).not_to be nil
   end
@@ -226,6 +234,54 @@ RSpec.describe Censorius::UUIDGenerator do
       PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/XCConfigurationList
       PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/XCConfigurationList/XCBuildConfiguration(Debug)
       PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/XCConfigurationList/XCBuildConfiguration(Release)
+      PBXProject(#{@spec_safe_name})/XCConfigurationList
+      PBXProject(#{@spec_safe_name})/XCConfigurationList/XCBuildConfiguration(Debug)
+      PBXProject(#{@spec_safe_name})/XCConfigurationList/XCBuildConfiguration(Release)
+    ].sorted_md5s
+  end
+
+  it 'generates UUIDs for build rules' do
+    target = @project.new_target(:application, 'AppTarget', :ios)
+    target.resources_build_phase.remove_from_project
+    target.source_build_phase.remove_from_project
+    add_build_rule(target, 'BuildRule1')
+    @generator.generate!
+
+    expect(@project.sorted_md5s).to eq %W[
+      PBXProject(#{@spec_safe_name})
+      PBXProject(#{@spec_safe_name})/PBXFileReference(${BUILT_PRODUCTS_DIR}/AppTarget.app)
+      PBXProject(#{@spec_safe_name})/PBXFileReference(${DEVELOPER_DIR}/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.0.sdk/System/Library/Frameworks/Foundation.framework)
+      PBXProject(#{@spec_safe_name})/PBXGroup(/)
+      PBXProject(#{@spec_safe_name})/PBXGroup(/Frameworks)
+      PBXProject(#{@spec_safe_name})/PBXGroup(/Frameworks/iOS)
+      PBXProject(#{@spec_safe_name})/PBXGroup(/Products)
+      PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)
+      PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXBuildRule(BuildRule1)
+      PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXFrameworksBuildPhase(Frameworks)
+      PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXFrameworksBuildPhase(Frameworks)/PBXBuildFile(PBXProject(#{@spec_safe_name})/PBXFileReference(${DEVELOPER_DIR}/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.0.sdk/System/Library/Frameworks/Foundation.framework))
+      PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/XCConfigurationList
+      PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/XCConfigurationList/XCBuildConfiguration(Debug)
+      PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/XCConfigurationList/XCBuildConfiguration(Release)
+      PBXProject(#{@spec_safe_name})/XCConfigurationList
+      PBXProject(#{@spec_safe_name})/XCConfigurationList/XCBuildConfiguration(Debug)
+      PBXProject(#{@spec_safe_name})/XCConfigurationList/XCBuildConfiguration(Release)
+    ].sorted_md5s
+  end
+
+  it 'generates UUIDs for aggregate targets' do
+    target = @project.new_aggregate_target('AggregateTarget1')
+    target.build_phases.first.remove_from_project until target.build_phases.empty?
+    @generator.generate!
+
+    expect(@project.sorted_md5s).to eq %W[
+      PBXProject(#{@spec_safe_name})
+      PBXProject(#{@spec_safe_name})/PBXGroup(/)
+      PBXProject(#{@spec_safe_name})/PBXGroup(/Frameworks)
+      PBXProject(#{@spec_safe_name})/PBXGroup(/Products)
+      PBXProject(#{@spec_safe_name})/PBXAggregateTarget(AggregateTarget1)
+      PBXProject(#{@spec_safe_name})/PBXAggregateTarget(AggregateTarget1)/XCConfigurationList
+      PBXProject(#{@spec_safe_name})/PBXAggregateTarget(AggregateTarget1)/XCConfigurationList/XCBuildConfiguration(Debug)
+      PBXProject(#{@spec_safe_name})/PBXAggregateTarget(AggregateTarget1)/XCConfigurationList/XCBuildConfiguration(Release)
       PBXProject(#{@spec_safe_name})/XCConfigurationList
       PBXProject(#{@spec_safe_name})/XCConfigurationList/XCBuildConfiguration(Debug)
       PBXProject(#{@spec_safe_name})/XCConfigurationList/XCBuildConfiguration(Release)
