@@ -164,7 +164,11 @@ module Censorius
     end
 
     def generate_paths_remote_swift_package_reference(reference, parent_path)
-      @paths_by_object[reference] = "#{parent_path}/XCRemoteSwiftPackageReference(#{reference.repositoryURL}/#{reference.requirement})"
+      params = [
+        reference.repositoryURL,
+        reference.requirement
+      ]
+      @paths_by_object[reference] = "#{parent_path}/XCRemoteSwiftPackageReference(#{params.join(', ')})"
     end
 
     def generate_paths_remote_swift_package_product_dependency(dependency, parent_path)
