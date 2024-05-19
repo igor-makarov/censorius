@@ -287,4 +287,50 @@ RSpec.describe Censorius::UUIDGenerator do
       PBXProject(#{@spec_safe_name})/XCConfigurationList/XCBuildConfiguration(Release)
     ].sorted_md5s
   end
+
+  it 'generates UUIDs for SwiftPM dependencies' do
+    target = @project.new_target(:application, 'AppTarget', :ios)
+    target.resources_build_phase.remove_from_project
+    target.source_build_phase.remove_from_project
+
+    package_reference = @project.new(Xcodeproj::Project::Object::XCRemoteSwiftPackageReference)
+    package_reference.repositoryURL = 'https://url.to/'
+    package_reference.requirement = { kind: 'upToNextMajorVersion', minimumVersion: '5.0.0' }
+    @project.root_object.package_references << package_reference
+
+    dependency = @project.new(Xcodeproj::Project::Object::XCSwiftPackageProductDependency)
+    dependency.package = package_reference
+    dependency.product_name = 'Product1'
+    target.package_product_dependencies << dependency
+
+    build_file = @project.new(Xcodeproj::Project::Object::PBXBuildFile)
+    build_file.product_ref = dependency
+    target.frameworks_build_phase.files << build_file
+
+    @generator.generate!
+
+    expect(@project.sorted_md5s).to eq (%W[
+      PBXProject(#{@spec_safe_name})
+      PBXProject(#{@spec_safe_name})/PBXFileReference(${BUILT_PRODUCTS_DIR}/AppTarget.app)
+      PBXProject(#{@spec_safe_name})/PBXFileReference(${DEVELOPER_DIR}/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.0.sdk/System/Library/Frameworks/Foundation.framework)
+      PBXProject(#{@spec_safe_name})/PBXGroup(/)
+      PBXProject(#{@spec_safe_name})/PBXGroup(/Frameworks)
+      PBXProject(#{@spec_safe_name})/PBXGroup(/Frameworks/iOS)
+      PBXProject(#{@spec_safe_name})/PBXGroup(/Products)
+      PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)
+      PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXFrameworksBuildPhase(Frameworks)
+      PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXFrameworksBuildPhase(Frameworks)/PBXBuildFile(/XCSwiftPackageProductDependency(Product1))
+      PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXFrameworksBuildPhase(Frameworks)/PBXBuildFile(PBXProject(#{@spec_safe_name})/PBXFileReference(${DEVELOPER_DIR}/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.0.sdk/System/Library/Frameworks/Foundation.framework))
+      PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/XCConfigurationList
+      PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/XCConfigurationList/XCBuildConfiguration(Debug)
+      PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/XCConfigurationList/XCBuildConfiguration(Release)
+      PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/XCSwiftPackageProductDependency(Product1)
+      PBXProject(#{@spec_safe_name})/XCConfigurationList
+      PBXProject(#{@spec_safe_name})/XCConfigurationList/XCBuildConfiguration(Debug)
+      PBXProject(#{@spec_safe_name})/XCConfigurationList/XCBuildConfiguration(Release)
+    ] + [
+      # declared in a weird way because of string split/escape
+      "PBXProject(#{@spec_safe_name})/XCRemoteSwiftPackageReference(https://url.to/, {:kind=>\"upToNextMajorVersion\", :minimumVersion=>\"5.0.0\"})"
+    ]).sorted_md5s
+  end
 end
