@@ -1,6 +1,8 @@
 AllCops:
   NewCops: disable
 
+Style/GuardClause:
+  Enabled: false
 Metrics/AbcSize:
   Enabled: false
 Metrics/ClassLength:
