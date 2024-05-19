@@ -90,8 +90,10 @@ module Censorius
       target.dependencies.each do |dependency|
         generate_paths(dependency, path)
       end
-      target.package_product_dependencies.each do |dependency|
-        generate_paths(dependency, path)
+      if target.respond_to?(:package_product_dependencies)
+        target.package_product_dependencies.each do |dependency|
+          generate_paths(dependency, path)
+        end
       end
     end
 
