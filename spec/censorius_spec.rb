@@ -307,6 +307,10 @@ RSpec.describe Censorius::UUIDGenerator do
     build_file.product_ref = dependency
     target.frameworks_build_phase.files << build_file
 
+    target_dependency = @project.new(Xcodeproj::Project::PBXTargetDependency)
+    target_dependency.product_ref = dependency
+    target.dependencies << target_dependency
+
     @generator.generate!
 
     expect(@project.sorted_md5s).to eq (%W[
@@ -321,6 +325,7 @@ RSpec.describe Censorius::UUIDGenerator do
       PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXFrameworksBuildPhase(Frameworks)
       PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXFrameworksBuildPhase(Frameworks)/PBXBuildFile(/XCSwiftPackageProductDependency(Product1))
       PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXFrameworksBuildPhase(Frameworks)/PBXBuildFile(PBXProject(#{@spec_safe_name})/PBXFileReference(${DEVELOPER_DIR}/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.0.sdk/System/Library/Frameworks/Foundation.framework))
+      PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXTargetDependency(/XCSwiftPackageProductDependency(Product1))
       PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/XCConfigurationList
       PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/XCConfigurationList/XCBuildConfiguration(Debug)
       PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/XCConfigurationList/XCBuildConfiguration(Release)

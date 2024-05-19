@@ -143,10 +143,15 @@ module Censorius
     end
 
     def generate_paths_target_dependency(dependency, parent_path)
-      raise "Unsupported: #{dependency}" unless dependency.target_proxy
-
-      @paths_by_object[dependency] = path = "#{parent_path}/PBXTargetDependency(#{dependency.name})"
-      generate_paths(dependency.target_proxy, path)
+      if dependency.target_proxy
+        @paths_by_object[dependency] = path = "#{parent_path}/PBXTargetDependency(#{dependency.name})"
+        generate_paths(dependency.target_proxy, path)
+      elsif dependency.product_ref
+        product_ref_path = generate_paths(dependency.product_ref)
+        @paths_by_object[dependency] = "#{parent_path}/PBXTargetDependency(#{product_ref_path})"
+      else
+        raise "Unsupported: #{dependency}"
+      end
     end
 
     def generate_paths_container_item_proxy(proxy, parent_path)
