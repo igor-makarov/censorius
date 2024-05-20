@@ -44,6 +44,8 @@ module Censorius
         generate_paths_reference_proxy(object, parent_path)
       when Xcodeproj::Project::Object::XCRemoteSwiftPackageReference
         generate_paths_remote_swift_package_reference(object, parent_path)
+      when Xcodeproj::Project::Object::XCLocalSwiftPackageReference
+        generate_paths_local_swift_package_reference(object, parent_path)
       when Xcodeproj::Project::Object::XCSwiftPackageProductDependency
         generate_paths_remote_swift_package_product_dependency(object, parent_path)
       else
@@ -174,6 +176,13 @@ module Censorius
         reference.requirement
       ]
       @paths_by_object[reference] = "#{parent_path}/XCRemoteSwiftPackageReference(#{params.join(', ')})"
+    end
+
+    def generate_paths_local_swift_package_reference(reference, parent_path)
+      params = [
+        reference.relative_path
+      ]
+      @paths_by_object[reference] = "#{parent_path}/XCLocalSwiftPackageReference(#{params.join(', ')})"
     end
 
     def generate_paths_remote_swift_package_product_dependency(dependency, parent_path)

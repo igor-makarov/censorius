@@ -297,6 +297,9 @@ RSpec.describe Censorius::UUIDGenerator do
     package_reference.repositoryURL = 'https://url.to/'
     package_reference.requirement = { kind: 'upToNextMajorVersion', minimumVersion: '5.0.0' }
     @project.root_object.package_references << package_reference
+    local_package_reference = @project.new(Xcodeproj::Project::Object::XCLocalSwiftPackageReference)
+    local_package_reference.relative_path = '../path/to/package'
+    @project.root_object.package_references << local_package_reference
 
     dependency = @project.new(Xcodeproj::Project::Object::XCSwiftPackageProductDependency)
     dependency.package = package_reference
@@ -335,6 +338,7 @@ RSpec.describe Censorius::UUIDGenerator do
       PBXProject(#{@spec_safe_name})/XCConfigurationList/XCBuildConfiguration(Release)
     ] + [
       # declared in a weird way because of string split/escape
+      "PBXProject(#{@spec_safe_name})/XCLocalSwiftPackageReference(../path/to/package)",
       "PBXProject(#{@spec_safe_name})/XCRemoteSwiftPackageReference(https://url.to/, {:kind=>\"upToNextMajorVersion\", :minimumVersion=>\"5.0.0\"})"
     ]).sorted_md5s
   end
