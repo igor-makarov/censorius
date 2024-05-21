@@ -326,13 +326,17 @@ RSpec.describe Censorius::UUIDGenerator do
       PBXProject(#{@spec_safe_name})/PBXGroup(/Products)
       PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)
       PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXFrameworksBuildPhase(Frameworks)
-      PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXFrameworksBuildPhase(Frameworks)/PBXBuildFile(/XCSwiftPackageProductDependency(Product1))
       PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXFrameworksBuildPhase(Frameworks)/PBXBuildFile(PBXProject(#{@spec_safe_name})/PBXFileReference(${DEVELOPER_DIR}/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.0.sdk/System/Library/Frameworks/Foundation.framework))
-      PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXTargetDependency(/XCSwiftPackageProductDependency(Product1))
+    ] + [
+      "PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXFrameworksBuildPhase(Frameworks)/PBXBuildFile(PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/XCSwiftPackageProductDependency(PBXProject(#{@spec_safe_name})/XCRemoteSwiftPackageReference(https://url.to/, {:kind=>\"upToNextMajorVersion\", :minimumVersion=>\"5.0.0\"}), Product1))",
+      "PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXTargetDependency(PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/XCSwiftPackageProductDependency(PBXProject(#{@spec_safe_name})/XCRemoteSwiftPackageReference(https://url.to/, {:kind=>\"upToNextMajorVersion\", :minimumVersion=>\"5.0.0\"}), Product1))"
+    ] + %W[
       PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/XCConfigurationList
       PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/XCConfigurationList/XCBuildConfiguration(Debug)
       PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/XCConfigurationList/XCBuildConfiguration(Release)
-      PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/XCSwiftPackageProductDependency(Product1)
+    ] + [
+      "PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/XCSwiftPackageProductDependency(PBXProject(#{@spec_safe_name})/XCRemoteSwiftPackageReference(https://url.to/, {:kind=>\"upToNextMajorVersion\", :minimumVersion=>\"5.0.0\"}), Product1)"
+    ] + %W[
       PBXProject(#{@spec_safe_name})/XCConfigurationList
       PBXProject(#{@spec_safe_name})/XCConfigurationList/XCBuildConfiguration(Debug)
       PBXProject(#{@spec_safe_name})/XCConfigurationList/XCBuildConfiguration(Release)

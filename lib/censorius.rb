@@ -47,7 +47,7 @@ module Censorius
       when Xcodeproj::Project::Object::XCLocalSwiftPackageReference
         generate_paths_local_swift_package_reference(object, parent_path)
       when Xcodeproj::Project::Object::XCSwiftPackageProductDependency
-        generate_paths_remote_swift_package_product_dependency(object, parent_path)
+        generate_paths_swift_package_product_dependency(object, parent_path)
       else
         raise "Unrecognized: #{object.class}, at: #{parent_path}"
       end
@@ -59,11 +59,11 @@ module Censorius
       @paths_by_object[project] = path = "PBXProject(#{project.name})"
       generate_paths(project.main_group, path)
       generate_paths(project.build_configuration_list, path)
-      project.targets.each do |target|
-        generate_paths(target, path)
-      end
       project.package_references.each do |package_reference|
         generate_paths(package_reference, path)
+      end
+      project.targets.each do |target|
+        generate_paths(target, path)
       end
     end
 
@@ -80,6 +80,11 @@ module Censorius
 
     def generate_paths_target(target, parent_path)
       @paths_by_object[target] = path = "#{parent_path}/#{target.class.name.split('::').last}(#{target.name})"
+      if target.respond_to?(:package_product_dependencies)
+        target.package_product_dependencies.each do |dependency|
+          generate_paths(dependency, path)
+        end
+      end
       target.build_phases.each do |phase|
         generate_paths(phase, path)
       end
@@ -91,11 +96,6 @@ module Censorius
       generate_paths(target.build_configuration_list, path)
       target.dependencies.each do |dependency|
         generate_paths(dependency, path)
-      end
-      if target.respond_to?(:package_product_dependencies)
-        target.package_product_dependencies.each do |dependency|
-          generate_paths(dependency, path)
-        end
       end
     end
 
@@ -111,7 +111,7 @@ module Censorius
         file_ref_path = generate_paths(build_file.file_ref)
         @paths_by_object[build_file] = "#{parent_path}/PBXBuildFile(#{file_ref_path})"
       elsif build_file.product_ref
-        product_ref_path = generate_paths(build_file.product_ref)
+        product_ref_path = @paths_by_object[build_file.product_ref]
         @paths_by_object[build_file] = "#{parent_path}/PBXBuildFile(#{product_ref_path})"
       else
         raise "Unsupported: #{build_file}"
@@ -149,7 +149,7 @@ module Censorius
         @paths_by_object[dependency] = path = "#{parent_path}/PBXTargetDependency(#{dependency.name})"
         generate_paths(dependency.target_proxy, path)
       elsif dependency.product_ref
-        product_ref_path = generate_paths(dependency.product_ref)
+        product_ref_path = @paths_by_object[dependency.product_ref]
         @paths_by_object[dependency] = "#{parent_path}/PBXTargetDependency(#{product_ref_path})"
       else
         raise "Unsupported: #{dependency}"
@@ -185,8 +185,12 @@ module Censorius
       @paths_by_object[reference] = "#{parent_path}/XCLocalSwiftPackageReference(#{params.join(', ')})"
     end
 
-    def generate_paths_remote_swift_package_product_dependency(dependency, parent_path)
-      @paths_by_object[dependency] = "#{parent_path}/XCSwiftPackageProductDependency(#{dependency.product_name})"
+    def generate_paths_swift_package_product_dependency(dependency, parent_path)
+      params = [
+        @paths_by_object[dependency.package],
+        dependency.product_name
+      ]
+      @paths_by_object[dependency] = "#{parent_path}/XCSwiftPackageProductDependency(#{params.join(', ')})"
     end
 
     def write_debug_paths
