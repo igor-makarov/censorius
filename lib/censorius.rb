@@ -111,6 +111,7 @@ module Censorius
         file_ref_path = generate_paths(build_file.file_ref)
         @paths_by_object[build_file] = "#{parent_path}/PBXBuildFile(#{file_ref_path})"
       elsif build_file.product_ref
+        @paths_by_object[build_file.product_ref] ||= generate_paths(dependency.product_ref, parent_path)
         product_ref_path = @paths_by_object[build_file.product_ref]
         @paths_by_object[build_file] = "#{parent_path}/PBXBuildFile(#{product_ref_path})"
       else
@@ -149,6 +150,7 @@ module Censorius
         @paths_by_object[dependency] = path = "#{parent_path}/PBXTargetDependency(#{dependency.name})"
         generate_paths(dependency.target_proxy, path)
       elsif dependency.product_ref
+        @paths_by_object[dependency.product_ref] ||= generate_paths(dependency.product_ref, parent_path)
         product_ref_path = @paths_by_object[dependency.product_ref]
         @paths_by_object[dependency] = "#{parent_path}/PBXTargetDependency(#{product_ref_path})"
       else
