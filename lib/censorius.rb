@@ -62,6 +62,10 @@ module Censorius
       project.package_references.each do |package_reference|
         generate_paths(package_reference, path)
       end
+      project.project_references.each do |ref|
+        product_group = ref[:product_group]
+        generate_paths(product_group, path) if product_group
+      end
       project.targets.each do |target|
         generate_paths(target, path)
       end

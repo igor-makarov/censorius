@@ -288,6 +288,52 @@ RSpec.describe Censorius::UUIDGenerator do
     ].sorted_md5s
   end
 
+  it 'generates UUIDs for project_references with product groups not in main_group' do
+    # Simulate the CocoaPods scenario: project_references contains a product_group
+    # that is NOT a child of any group under main_group.
+    other_project = Xcodeproj::Project.open('spec/fixtures/OtherProject.xcodeproj')
+
+    # Use add_dependency to create a proper project_reference entry
+    target = @project.new_target(:application, 'AppTarget', :ios)
+    target.build_phases.first.remove_from_project until target.build_phases.empty?
+    @project['Frameworks/iOS'].children.first.remove_from_project
+    @project['Frameworks/iOS'].remove_from_project
+    Xcodeproj::Project::FileReferencesFactory.new_reference(@project.main_group, other_project.path, :group)
+    target.add_dependency(other_project.targets.first)
+
+    # Now detach the product group from main_group to simulate CocoaPods.
+    # Use children.delete (not remove_from_project) to keep it in the project objects.
+    product_group = @project.root_object.project_references.first[:product_group]
+    @project.main_group.children.delete(product_group)
+
+    @generator.generate!
+
+    # The product group's hierarchy_path includes the project name since it's
+    # detached from main_group (simulating how CocoaPods sets up project_references).
+    pg_path = product_group.hierarchy_path
+    expect(@project.sorted_md5s).to eq (%W[
+      PBXProject(#{@spec_safe_name})
+      PBXProject(#{@spec_safe_name})/PBXFileReference(${BUILT_PRODUCTS_DIR}/AppTarget.app)
+      PBXProject(#{@spec_safe_name})/PBXFileReference(spec/fixtures/OtherProject.xcodeproj)
+      PBXProject(#{@spec_safe_name})/PBXGroup(/)
+      PBXProject(#{@spec_safe_name})/PBXGroup(/Frameworks)
+      PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)
+    ] + [
+      "PBXProject(#{@spec_safe_name})/PBXGroup(#{pg_path})",
+      "PBXProject(#{@spec_safe_name})/PBXGroup(#{pg_path})/PBXReferenceProxy(BUILT_PRODUCTS_DIR/FrameworkTargetInOtherProject.framework)",
+      "PBXProject(#{@spec_safe_name})/PBXGroup(#{pg_path})/PBXReferenceProxy(BUILT_PRODUCTS_DIR/FrameworkTargetInOtherProject.framework)/PBXContainerItemProxy(type: 2, containerPortal: OtherProject.xcodeproj, remoteInfo: Subproject)",
+      "PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXTargetDependency(FrameworkTargetInOtherProject)",
+      "PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXTargetDependency(FrameworkTargetInOtherProject)/PBXContainerItemProxy(type: 1, containerPortal: OtherProject.xcodeproj, remoteInfo: FrameworkTargetInOtherProject)"
+    ] + %W[
+      PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/XCConfigurationList
+      PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/XCConfigurationList/XCBuildConfiguration(Debug)
+      PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/XCConfigurationList/XCBuildConfiguration(Release)
+      PBXProject(#{@spec_safe_name})/XCConfigurationList
+      PBXProject(#{@spec_safe_name})/XCConfigurationList/XCBuildConfiguration(Debug)
+      PBXProject(#{@spec_safe_name})/XCConfigurationList/XCBuildConfiguration(Release)
+    ]).sorted_md5s
+  end
+
   it 'generates UUIDs for SwiftPM dependencies' do
     target = @project.new_target(:application, 'AppTarget', :ios)
     target.resources_build_phase.remove_from_project
