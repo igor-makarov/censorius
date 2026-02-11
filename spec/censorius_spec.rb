@@ -3,9 +3,7 @@
 RSpec.describe Censorius::UUIDGenerator do
   before(:each) do |s|
     @spec_safe_name = s.metadata[:full_description].gsub(/[^0-9a-z]/i, '_')
-    @foundation_path = "${DEVELOPER_DIR}/Platforms/iPhoneOS.platform/Developer/SDKs/" \
-                       "iPhoneOS#{Xcodeproj::Constants::LAST_KNOWN_IOS_SDK}.sdk/" \
-                       "System/Library/Frameworks/Foundation.framework"
+    @foundation_path = "${DEVELOPER_DIR}/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS#{Xcodeproj::Constants::LAST_KNOWN_IOS_SDK}.sdk/System/Library/Frameworks/Foundation.framework"
     @project = Xcodeproj::Project.new("#{@spec_safe_name}.xcodeproj")
     @generator = Censorius::UUIDGenerator.new([@project])
   end
