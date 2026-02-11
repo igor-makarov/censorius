@@ -3,6 +3,9 @@
 RSpec.describe Censorius::UUIDGenerator do
   before(:each) do |s|
     @spec_safe_name = s.metadata[:full_description].gsub(/[^0-9a-z]/i, '_')
+    @foundation_path = "${DEVELOPER_DIR}/Platforms/iPhoneOS.platform/Developer/SDKs/" \
+                       "iPhoneOS#{Xcodeproj::Constants::LAST_KNOWN_IOS_SDK}.sdk/" \
+                       "System/Library/Frameworks/Foundation.framework"
     @project = Xcodeproj::Project.new("#{@spec_safe_name}.xcodeproj")
     @generator = Censorius::UUIDGenerator.new([@project])
   end
@@ -219,7 +222,7 @@ RSpec.describe Censorius::UUIDGenerator do
     expect(@project.sorted_md5s).to eq %W[
       PBXProject(#{@spec_safe_name})
       PBXProject(#{@spec_safe_name})/PBXFileReference(${BUILT_PRODUCTS_DIR}/AppTarget.app)
-      PBXProject(#{@spec_safe_name})/PBXFileReference(${DEVELOPER_DIR}/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.0.sdk/System/Library/Frameworks/Foundation.framework)
+      PBXProject(#{@spec_safe_name})/PBXFileReference(#{@foundation_path})
       PBXProject(#{@spec_safe_name})/PBXFileReference(path/to/Framework.framework)
       PBXProject(#{@spec_safe_name})/PBXGroup(/)
       PBXProject(#{@spec_safe_name})/PBXGroup(/Frameworks)
@@ -229,7 +232,7 @@ RSpec.describe Censorius::UUIDGenerator do
       PBXProject(#{@spec_safe_name})/PBXGroup(/path/to)
       PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)
       PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXFrameworksBuildPhase(Frameworks)
-      PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXFrameworksBuildPhase(Frameworks)/PBXBuildFile(PBXProject(#{@spec_safe_name})/PBXFileReference(${DEVELOPER_DIR}/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.0.sdk/System/Library/Frameworks/Foundation.framework))
+      PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXFrameworksBuildPhase(Frameworks)/PBXBuildFile(PBXProject(#{@spec_safe_name})/PBXFileReference(#{@foundation_path}))
       PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXFrameworksBuildPhase(Frameworks)/PBXBuildFile(PBXProject(#{@spec_safe_name})/PBXFileReference(path/to/Framework.framework))
       PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/XCConfigurationList
       PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/XCConfigurationList/XCBuildConfiguration(Debug)
@@ -250,7 +253,7 @@ RSpec.describe Censorius::UUIDGenerator do
     expect(@project.sorted_md5s).to eq %W[
       PBXProject(#{@spec_safe_name})
       PBXProject(#{@spec_safe_name})/PBXFileReference(${BUILT_PRODUCTS_DIR}/AppTarget.app)
-      PBXProject(#{@spec_safe_name})/PBXFileReference(${DEVELOPER_DIR}/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.0.sdk/System/Library/Frameworks/Foundation.framework)
+      PBXProject(#{@spec_safe_name})/PBXFileReference(#{@foundation_path})
       PBXProject(#{@spec_safe_name})/PBXGroup(/)
       PBXProject(#{@spec_safe_name})/PBXGroup(/Frameworks)
       PBXProject(#{@spec_safe_name})/PBXGroup(/Frameworks/iOS)
@@ -258,7 +261,7 @@ RSpec.describe Censorius::UUIDGenerator do
       PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)
       PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXBuildRule(BuildRule1)
       PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXFrameworksBuildPhase(Frameworks)
-      PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXFrameworksBuildPhase(Frameworks)/PBXBuildFile(PBXProject(#{@spec_safe_name})/PBXFileReference(${DEVELOPER_DIR}/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.0.sdk/System/Library/Frameworks/Foundation.framework))
+      PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXFrameworksBuildPhase(Frameworks)/PBXBuildFile(PBXProject(#{@spec_safe_name})/PBXFileReference(#{@foundation_path}))
       PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/XCConfigurationList
       PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/XCConfigurationList/XCBuildConfiguration(Debug)
       PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/XCConfigurationList/XCBuildConfiguration(Release)
@@ -365,14 +368,14 @@ RSpec.describe Censorius::UUIDGenerator do
     expect(@project.sorted_md5s).to eq (%W[
       PBXProject(#{@spec_safe_name})
       PBXProject(#{@spec_safe_name})/PBXFileReference(${BUILT_PRODUCTS_DIR}/AppTarget.app)
-      PBXProject(#{@spec_safe_name})/PBXFileReference(${DEVELOPER_DIR}/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.0.sdk/System/Library/Frameworks/Foundation.framework)
+      PBXProject(#{@spec_safe_name})/PBXFileReference(#{@foundation_path})
       PBXProject(#{@spec_safe_name})/PBXGroup(/)
       PBXProject(#{@spec_safe_name})/PBXGroup(/Frameworks)
       PBXProject(#{@spec_safe_name})/PBXGroup(/Frameworks/iOS)
       PBXProject(#{@spec_safe_name})/PBXGroup(/Products)
       PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)
       PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXFrameworksBuildPhase(Frameworks)
-      PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXFrameworksBuildPhase(Frameworks)/PBXBuildFile(PBXProject(#{@spec_safe_name})/PBXFileReference(${DEVELOPER_DIR}/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.0.sdk/System/Library/Frameworks/Foundation.framework))
+      PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXFrameworksBuildPhase(Frameworks)/PBXBuildFile(PBXProject(#{@spec_safe_name})/PBXFileReference(#{@foundation_path}))
     ] + [
       "PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXFrameworksBuildPhase(Frameworks)/PBXBuildFile(PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/XCSwiftPackageProductDependency(PBXProject(#{@spec_safe_name})/XCRemoteSwiftPackageReference(https://url.to/, {:kind=>\"upToNextMajorVersion\", :minimumVersion=>\"5.0.0\"}), Product1))",
       "PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXTargetDependency(PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/XCSwiftPackageProductDependency(PBXProject(#{@spec_safe_name})/XCRemoteSwiftPackageReference(https://url.to/, {:kind=>\"upToNextMajorVersion\", :minimumVersion=>\"5.0.0\"}), Product1))"
@@ -416,14 +419,14 @@ RSpec.describe Censorius::UUIDGenerator do
     expect(@project.sorted_md5s).to eq (%W[
       PBXProject(#{@spec_safe_name})
       PBXProject(#{@spec_safe_name})/PBXFileReference(${BUILT_PRODUCTS_DIR}/AppTarget.app)
-      PBXProject(#{@spec_safe_name})/PBXFileReference(${DEVELOPER_DIR}/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.0.sdk/System/Library/Frameworks/Foundation.framework)
+      PBXProject(#{@spec_safe_name})/PBXFileReference(#{@foundation_path})
       PBXProject(#{@spec_safe_name})/PBXGroup(/)
       PBXProject(#{@spec_safe_name})/PBXGroup(/Frameworks)
       PBXProject(#{@spec_safe_name})/PBXGroup(/Frameworks/iOS)
       PBXProject(#{@spec_safe_name})/PBXGroup(/Products)
       PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)
       PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXFrameworksBuildPhase(Frameworks)
-      PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXFrameworksBuildPhase(Frameworks)/PBXBuildFile(PBXProject(#{@spec_safe_name})/PBXFileReference(${DEVELOPER_DIR}/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.0.sdk/System/Library/Frameworks/Foundation.framework))
+      PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXFrameworksBuildPhase(Frameworks)/PBXBuildFile(PBXProject(#{@spec_safe_name})/PBXFileReference(#{@foundation_path}))
     ] + [
       "PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/PBXTargetDependency(PBXProject(#{@spec_safe_name})/PBXNativeTarget(AppTarget)/XCSwiftPackageProductDependency(PBXProject(#{@spec_safe_name})/XCRemoteSwiftPackageReference(https://url.to/, {:kind=>\"upToNextMajorVersion\", :minimumVersion=>\"5.0.0\"}), Product1))"
     ] + %W[
